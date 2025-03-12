@@ -637,8 +637,8 @@ add_action( 'pre_get_posts', 'restrict_content_to_author' );
 //         register_block_pattern(
 //             $pattern_name,
 //             array(
-//                 'title'       => __( ucfirst(basename($file, '.php')), 'onepree'),
-//                 'description' => __( 'A custom pattern based on ' . basename($file, '.php'), 'onepree'),
+//                 'title'       => __( ucfirst(basename($file, '.php')), 'oneprees'),
+//                 'description' => __( 'A custom pattern based on ' . basename($file, '.php'), 'oneprees'),
 //                 'content'     => $content,
 // 				'inserter'    => true,
 //             )
@@ -646,6 +646,48 @@ add_action( 'pre_get_posts', 'restrict_content_to_author' );
 //     }
 // }
 // add_action('init', 'custom_register_block_patterns');
+
+
+// // patterns 폴더 아래의 Custom Pattern을 일괄적으로 등록
+function custom_register_block_patterns() {
+    $patterns_dir = get_template_directory() . '/patterns/';
+    $pattern_files = glob($patterns_dir . '*.php');
+
+	// 각 패턴 파일에 대해 반복
+    foreach ($pattern_files as $file) {
+        $pattern_data = include $file;
+
+        if (!is_array($pattern_data)) {
+            continue;
+        }
+
+		// 패턴 카테고리 등록 (미리 등록되지 않았다면 등록)
+        if (!empty($pattern_data['categories'])) {
+            foreach ($pattern_data['categories'] as $category) {
+                if (!term_exists($category, 'block_pattern_category')) {	// 지정된 카테고리가 존재하는지 확인
+                    register_block_pattern_category($category, array('label' => ucfirst($category)));
+                }
+            }
+        }
+
+		// 파일 이름에서 .php 확장자 제거
+        $pattern_name = basename($file, '.php');
+
+        register_block_pattern(
+            $pattern_name,
+            array(
+                'title'       => __($pattern_data['title'], 'onepress'),
+                'description' => __($pattern_data['description'], 'onepress'),
+                'categories'  => $pattern_data['categories'] ?? array(), // 파일에서 카테고리 읽기
+                'content'     => $pattern_data['content'],
+				'inserter'    => true,
+            )
+        );
+    }
+}
+add_action('init', 'custom_register_block_patterns');
+
+
 
 
 // 등록한 Custom Pattern 삭제
