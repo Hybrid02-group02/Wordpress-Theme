@@ -623,31 +623,6 @@ function restrict_content_to_author( $query ) {
 add_action( 'pre_get_posts', 'restrict_content_to_author' );
 
 
-// patterns 폴더 아래의 Custom Pattern을 일괄적으로 등록
-// function custom_register_block_patterns() {
-//     $patterns_dir = get_template_directory() . '/patterns/';
-//     $pattern_files = glob( $patterns_dir . '*.php' );
-
-//     // 각 패턴 파일에 대해 반복
-//     foreach ( $pattern_files as $file ) {
-//         // 파일 이름에서 .php 확장자 제거
-//         $pattern_name = basename( $file, '.php' );
-//         $content = file_get_contents( $file );
-
-//         register_block_pattern(
-//             $pattern_name,
-//             array(
-//                 'title'       => __( ucfirst(basename($file, '.php')), 'oneprees'),
-//                 'description' => __( 'A custom pattern based on ' . basename($file, '.php'), 'oneprees'),
-//                 'content'     => $content,
-// 				'inserter'    => true,
-//             )
-//         );
-//     }
-// }
-// add_action('init', 'custom_register_block_patterns');
-
-
 // // patterns 폴더 아래의 Custom Pattern을 일괄적으로 등록
 function custom_register_block_patterns() {
     $patterns_dir = get_template_directory() . '/patterns/';
@@ -710,6 +685,27 @@ add_action('init', 'custom_register_block_patterns');
 // add_action('init', 'custom_unregister_dynamic_block_patterns');
 
 
+
+// 글쓴이 권한에 카테고리 생성 권한을 추가
+function allow_user_to_create_categories_but_not_delete() {
+    $role = get_role( 'author' );
+
+    if ( $role ) {
+        $role->add_cap( 'manage_categories' );
+        $role->remove_cap( 'delete_categories' );	// 카테고리 삭제 권한은 제거
+    }
+}
+add_action( 'admin_init', 'allow_user_to_create_categories_but_not_delete' );
+
+
+// 본문에서 첫 번째 이미지를 추출
+function get_first_image_from_content( $content ) {
+    // 정규 표현식을 사용하여 본문에서 첫 번째 이미지 태그를 찾음
+    preg_match('/<img[^>]+src="([^">]+)"/', $content, $matches);
+    
+    // 이미지가 있으면 그 URL 반환, 없으면 false 반환
+    return isset($matches[1]) ? $matches[1] : false;
+}
 
 
 
