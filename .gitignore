@@ -1,0 +1,19 @@
+# WordPress 자동 생성 파일 및 캐시 파일 제외
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# IDE 설정 파일 제외
+.vscode/
+.idea/
+*.suo
+*.user
+*.sln
+*.iml
+
+# WordPress 관련 제외
+wp-config.php
+wp-content/uploads/
+wp-content/cache/

@@ -1,6 +1,6 @@
 <?php
 return array(
-    'title'       => 'Sample1',
+    'title'       => 'Sample2',
     'description' => 'A custom pattern with columns, code, and a quote.',
     'categories'  => array('test'), // 원하는 카테고리 추가
     'content'     => 

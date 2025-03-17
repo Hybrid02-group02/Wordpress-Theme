@@ -13,33 +13,41 @@
 
 get_header();
 
-$layout = onepress_get_layout();
+$layout = onepress_get_layout();	// "right-sidebar"
 
     /**
      * @since 2.0.0
      * @see onepress_display_page_title
      */
     do_action( 'onepress_page_before_content' );
-    ?>
 
-	<!-- 추가된 내용: 페이지 헤더에 현재 로그인한 사용자 이름을 표시 -->
+
+	// 페이지 헤더에 현재 로그인한 사용자 이름을 표시
+	$current_user = wp_get_current_user();
+
+	// 사용자 이름과 권한에 따른 블로그 제목 설정
+	$blog_title = '';
+	if ( in_array( 'author', (array) $current_user->roles ) ) {
+		$blog_title = esc_js( $current_user->display_name ) . ' 님의 기술 블로그';
+	} else {
+		$blog_title = esc_js( $current_user->display_name ) . '님 환영합니다';
+	}
+	?>
+
+	<!-- 페이지 헤더에 사용자 이름 표시 -->
 	<script type="text/javascript">
-	document.addEventListener('DOMContentLoaded', function() {
-		// 홈 페이지일 때만 페이지 헤더를 수정
-		if (document.body.classList.contains('home')) {
-			const pageHeader = document.querySelector('.page-header .entry-title'); 
-			
-			if (pageHeader) {
-				// 현재 로그인한 사용자 이름을 WordPress에서 PHP로 가져와 JavaScript에 전달
-				const userName = '<?php echo esc_js( wp_get_current_user()->display_name ); ?>';
-				
-				// 페이지 헤더의 내용을 '[User Name]의 기술 블로그'로 변경
-				pageHeader.innerHTML = userName + ' 님의 기술 블로그';
+		document.addEventListener('DOMContentLoaded', function() {
+			if (document.body.classList.contains('home')) {
+				const pageHeader = document.querySelector('.page-header .entry-title');
+
+				if (pageHeader) {
+					const blogTitle = '<?php echo $blog_title; ?>';
+					pageHeader.innerHTML = blogTitle;
+				}
 			}
-		}
-	});
+		});
 	</script>
-	<!-- 추가된 내용: 헤더에 이름 표시 끝 -->
+	<!-- 헤더에 이름 표시 끝 -->
 
 
 	<div id="content" class="site-content">
@@ -86,10 +94,8 @@ $layout = onepress_get_layout();
 					}
 					?>
 				</div>
-				<!-- 카테고리 목록 출력 끝 -->
+				<!-- 카테고리 목록 출력 끝 -->				
 		
-
-
 				<main id="main" class="site-main" role="main">
 
 				<?php if ( have_posts() ) : ?>
@@ -125,6 +131,11 @@ $layout = onepress_get_layout();
 
 				</main>
 			</div>
+
+
+
+			<?php get_sidebar(); ?>
+
 
             <?php if ( $layout != 'no-sidebar' ) { ?>
                 <?php get_sidebar(); ?>

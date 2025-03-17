@@ -606,7 +606,6 @@ function onepress_the_excerpt($type = false, $length = false)
 /*
 *	사용자 추가 funtion
 */
-
 // '글쓴이' 권한의 유저가 자신의 게시물만 볼 수 있도록
 function restrict_content_to_author( $query ) {
     // 로그인한 사용자 확인
@@ -623,6 +622,7 @@ function restrict_content_to_author( $query ) {
 add_action( 'pre_get_posts', 'restrict_content_to_author' );
 
 
+
 // // patterns 폴더 아래의 Custom Pattern을 일괄적으로 등록
 function custom_register_block_patterns() {
     $patterns_dir = get_template_directory() . '/patterns/';
@@ -636,10 +636,9 @@ function custom_register_block_patterns() {
             continue;
         }
 
-		// 패턴 카테고리 등록 (미리 등록되지 않았다면 등록)
-        if (!empty($pattern_data['categories'])) {
+		if (!empty($pattern_data['categories'])) {
             foreach ($pattern_data['categories'] as $category) {
-                if (!term_exists($category, 'block_pattern_category')) {	// 지정된 카테고리가 존재하는지 확인
+                if (!WP_Block_Pattern_Categories_Registry::get_instance()->is_registered($category)) {
                     register_block_pattern_category($category, array('label' => ucfirst($category)));
                 }
             }
@@ -651,6 +650,7 @@ function custom_register_block_patterns() {
         register_block_pattern(
             $pattern_name,
             array(
+				// 'slug'        => $pattern_name, // 슬러그 필드 추가
                 'title'       => __($pattern_data['title'], 'onepress'),
                 'description' => __($pattern_data['description'], 'onepress'),
                 'categories'  => $pattern_data['categories'] ?? array(), // 파일에서 카테고리 읽기
@@ -661,9 +661,6 @@ function custom_register_block_patterns() {
     }
 }
 add_action('init', 'custom_register_block_patterns');
-
-
-
 
 // 등록한 Custom Pattern 삭제
 // function custom_unregister_dynamic_block_patterns() {
@@ -698,6 +695,7 @@ function allow_user_to_create_categories_but_not_delete() {
 add_action( 'admin_init', 'allow_user_to_create_categories_but_not_delete' );
 
 
+
 // 본문에서 첫 번째 이미지를 추출
 function get_first_image_from_content( $content ) {
     // 정규 표현식을 사용하여 본문에서 첫 번째 이미지 태그를 찾음
@@ -706,6 +704,113 @@ function get_first_image_from_content( $content ) {
     // 이미지가 있으면 그 URL 반환, 없으면 false 반환
     return isset($matches[1]) ? $matches[1] : false;
 }
+
+
+
+// 홈페이지로 리디렉션
+function redirect_after_post_delete($post_id) {
+    $redirect_url = isset($_GET['redirect_to']) ? $_GET['redirect_to'] : home_url();
+
+    // 삭제 후 리디렉션을 wp 훅에서 처리
+    set_transient('redirect_after_post_delete', $redirect_url, 60);
+}
+add_action('delete_post', 'redirect_after_post_delete');
+
+// wp 액션 훅에서 리디렉션 처리
+function perform_redirect_after_post_delete() {
+    $redirect_url = get_transient('redirect_after_post_delete');
+    
+    if ($redirect_url) {
+        // 리디렉션 실행 후, 트랜지언트 삭제
+        delete_transient('redirect_after_post_delete');
+        wp_redirect($redirect_url);
+        exit;
+    }
+}
+add_action('wp', 'perform_redirect_after_post_delete');
+
+
+
+// 사용자 상세 프로필 편집 페이지 등록
+// function create_user_profile_page() {
+//     // 페이지가 존재하지 않으면 새로 생성
+//     if ( null == get_page_by_path( 'user-profile' ) ) {
+//         $page_data = array(
+//             'post_title'    => '상세 프로필 편집',
+//             'post_content'  => '상세 프로필 편집 페이지의 내용이나 템플릿을 추가하세요.',
+//             'post_status'   => 'publish',
+//             'post_type'     => 'page',
+//             'post_name'     => 'user-profile',
+//             'post_author'   => 1,
+//         );
+
+//         $page_id = wp_insert_post( $page_data );
+
+// 		echo '<div>페이지 ID: ' . esc_html( $page_id ) . '</div>';
+
+// 		// 페이지에 템플릿 지정 (page-user-profile.php)
+//         if ( !is_wp_error( $page_id ) && $page_id > 0 ) {
+//             update_post_meta( $page_id, '_wp_page_template', 'page-user-profile.php' );
+//         }
+//     }
+// }
+// add_action( 'wp_loaded', 'create_user_profile_page' );
+
+// 사용자 상세 프로필 편집 페이지 등록
+function create_user_profile_page() {
+    // 페이지가 존재하는지 확인
+    $existing_page = get_page_by_path( 'user-profile' );
+    if ($existing_page) {
+        echo '<div>페이지 존재: ' . esc_html( $existing_page->ID ) . '</div>';
+    } else {
+        echo '<div>페이지가 없습니다. 새로 생성합니다.</div>';
+        // 페이지가 존재하지 않으면 새로 생성
+        $page_data = array(
+            'post_title'    => '상세 프로필 편집',
+            'post_content'  => '상세 프로필 편집 페이지의 내용이나 템플릿을 추가하세요.',
+            'post_status'   => 'publish',
+            'post_type'     => 'page',
+            'post_name'     => 'user-profile',
+            'post_author'   => 1, // 페이지의 작성자는 관리자(1)
+        );
+
+        $page_id = wp_insert_post( $page_data );
+
+        // 페이지 ID를 확인
+        echo '<div>새로 생성된 페이지 ID: ' . esc_html( $page_id ) . '</div>';
+
+        // 페이지에 템플릿 지정 (page-user-profile.php)
+        if ( !is_wp_error( $page_id ) && $page_id > 0 ) {
+            update_post_meta( $page_id, '_wp_page_template', 'page-user-profile.php' );
+        }
+    }
+}
+// 테마가 활성화될 때 한 번만 실행
+add_action( 'wp_login', 'create_user_profile_page' );
+
+
+// 상세 프로필 편집 페이지 연결 권한 
+function custom_page_access_control() {
+    // 'user-profile' 페이지에 접근하려면 최소한 'author' 권한이 있어야 함
+    if (is_page('user-profile')) {
+        // 'author' 권한이 있는 유저만 접근 허용
+        if (!current_user_can('edit_posts')) {  // 'edit_posts' 권한을 가진 유저는 'author' 이상
+            wp_redirect(home_url()); // 권한이 없는 경우 홈으로 리다이렉트
+            exit;
+        }
+    }
+}
+add_action('template_redirect', 'custom_page_access_control');
+
+
+
+
+
+
+
+
+
+
 
 
 
