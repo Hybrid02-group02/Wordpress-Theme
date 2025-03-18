@@ -132,14 +132,7 @@ $layout = onepress_get_layout();	// "right-sidebar"
 				</main>
 			</div>
 
-
-
 			<?php get_sidebar(); ?>
-
-
-            <?php if ( $layout != 'no-sidebar' ) { ?>
-                <?php get_sidebar(); ?>
-            <?php } ?>
 
 		</div>
 	</div>

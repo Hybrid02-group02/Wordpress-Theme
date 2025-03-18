@@ -623,20 +623,21 @@ add_action( 'pre_get_posts', 'restrict_content_to_author' );
 
 
 
-// // patterns 폴더 아래의 Custom Pattern을 일괄적으로 등록
+// patterns 폴더 아래의 Custom Pattern을 일괄적으로 등록
 function custom_register_block_patterns() {
     $patterns_dir = get_template_directory() . '/patterns/';
     $pattern_files = glob($patterns_dir . '*.php');
 
-	// 각 패턴 파일에 대해 반복
+    // 각 패턴 파일에 대해 반복
     foreach ($pattern_files as $file) {
         $pattern_data = include $file;
 
         if (!is_array($pattern_data)) {
-            continue;
+            continue; // 배열 형태가 아니면 건너뜀
         }
 
-		if (!empty($pattern_data['categories'])) {
+        // 패턴 카테고리 등록
+        if (!empty($pattern_data['categories'])) {
             foreach ($pattern_data['categories'] as $category) {
                 if (!WP_Block_Pattern_Categories_Registry::get_instance()->is_registered($category)) {
                     register_block_pattern_category($category, array('label' => ucfirst($category)));
@@ -644,25 +645,29 @@ function custom_register_block_patterns() {
             }
         }
 
-		// 파일 이름에서 .php 확장자 제거
+        // 파일 이름에서 .php 확장자 제거
         $pattern_name = basename($file, '.php');
+        
+        // 슬러그 생성 (배열 밖에서 정의)
+        $slug = 'custom-' . sanitize_title($pattern_name);
 
         register_block_pattern(
-            $pattern_name,
+            $slug, // slug 필수!
             array(
-				// 'slug'        => $pattern_name, // 슬러그 필드 추가
                 'title'       => __($pattern_data['title'], 'onepress'),
                 'description' => __($pattern_data['description'], 'onepress'),
-                'categories'  => $pattern_data['categories'] ?? array(), // 파일에서 카테고리 읽기
+                'categories'  => $pattern_data['categories'] ?? array(),
                 'content'     => $pattern_data['content'],
-				'inserter'    => true,
+                'inserter'    => true,
             )
         );
     }
 }
 add_action('init', 'custom_register_block_patterns');
 
-// 등록한 Custom Pattern 삭제
+
+
+// patterns 폴더 아래의 커스텀 패턴을 일괄적으로 등록 해제
 // function custom_unregister_dynamic_block_patterns() {
 //     $patterns_dir = get_template_directory() . '/patterns/';
 //     $pattern_files = glob($patterns_dir . '*.php');
@@ -671,11 +676,13 @@ add_action('init', 'custom_register_block_patterns');
 //     $pattern_registry = WP_Block_Patterns_Registry::get_instance();
 
 //     foreach ($pattern_files as $file) {
+//         // 슬러그 생성 (등록 시와 동일하게 생성해야 함)
 //         $pattern_name = basename($file, '.php');
+//         $slug = 'custom-' . sanitize_title($pattern_name);
 
 //         // 패턴이 등록되어 있는 경우만 삭제
-//         if ($pattern_registry->is_registered($pattern_name)) {
-//             unregister_block_pattern($pattern_name);
+//         if ($pattern_registry->is_registered($slug)) {
+//             unregister_block_pattern($slug);
 //         }
 //     }
 // }
@@ -732,31 +739,6 @@ add_action('wp', 'perform_redirect_after_post_delete');
 
 
 // 사용자 상세 프로필 편집 페이지 등록
-// function create_user_profile_page() {
-//     // 페이지가 존재하지 않으면 새로 생성
-//     if ( null == get_page_by_path( 'user-profile' ) ) {
-//         $page_data = array(
-//             'post_title'    => '상세 프로필 편집',
-//             'post_content'  => '상세 프로필 편집 페이지의 내용이나 템플릿을 추가하세요.',
-//             'post_status'   => 'publish',
-//             'post_type'     => 'page',
-//             'post_name'     => 'user-profile',
-//             'post_author'   => 1,
-//         );
-
-//         $page_id = wp_insert_post( $page_data );
-
-// 		echo '<div>페이지 ID: ' . esc_html( $page_id ) . '</div>';
-
-// 		// 페이지에 템플릿 지정 (page-user-profile.php)
-//         if ( !is_wp_error( $page_id ) && $page_id > 0 ) {
-//             update_post_meta( $page_id, '_wp_page_template', 'page-user-profile.php' );
-//         }
-//     }
-// }
-// add_action( 'wp_loaded', 'create_user_profile_page' );
-
-// 사용자 상세 프로필 편집 페이지 등록
 function create_user_profile_page() {
     // 페이지가 존재하는지 확인
     $existing_page = get_page_by_path( 'user-profile' );
@@ -785,8 +767,7 @@ function create_user_profile_page() {
         }
     }
 }
-// 테마가 활성화될 때 한 번만 실행
-add_action( 'wp_login', 'create_user_profile_page' );
+add_action( 'wp_login', 'create_user_profile_page' );	// 테마가 활성화될 때 한 번만 실행
 
 
 // 상세 프로필 편집 페이지 연결 권한 
@@ -801,6 +782,82 @@ function custom_page_access_control() {
     }
 }
 add_action('template_redirect', 'custom_page_access_control');
+
+
+
+// 특정 사용자의 사이드바 구현
+// <?php echo return_user_sidebar('사용자 별칭'); 으로 사용 
+function return_user_sidebar($username) {
+    // 사용자명으로 사용자 객체 얻기
+    $user = get_user_by('login', $username);
+    
+    // 사용자가 존재하지 않으면 반환하지 않음
+    if (!$user) {
+        return '사용자를 찾을 수 없습니다.';
+    }
+
+    $user_avatar_url = get_user_meta($user->ID, 'user_avatar', true);
+    $avatar_url = !empty($user_avatar_url) ? $user_avatar_url : get_template_directory_uri() . '/assets/images/custom_user_avatar.jpg';
+
+    $first_name = !empty($user->user_firstname) ? $user->user_firstname : '';
+    $last_name = !empty($user->user_lastname) ? $user->user_lastname : '';
+    $full_name = $last_name . ' ' . $first_name;
+
+    $user_email = !empty($user->user_email) ? $user->user_email : '';
+
+    $github_url = get_user_meta($user->ID, 'github_url', true);
+    $notion_url = get_user_meta($user->ID, 'user_notion_url', true);
+	$blog_url = get_user_meta($user->ID, 'user_blog_url', true);
+
+	$user_nickname = !empty($user->nickname) ? $user->nickname : $user->user_login;
+
+	// html 반환
+    ob_start();
+    ?>
+    <aside id="secondary" class="widget-area sidebar" role="complementary">
+		<h3><?php echo esc_html($user_nickname); ?>'s Profile</h3>
+
+        <img src="<?php echo esc_url($avatar_url); ?>" alt="사용자 아바타" class="custom-avatar-square" style="margin-bottom: 15px;">
+
+        <h5><?php echo esc_html($full_name); ?></h5>
+
+        <ul>
+            <?php
+            if (!empty($user_email)) {
+                echo '<li>Email: ' . esc_html($user_email) . '</li>';
+            }
+
+            if (!empty($github_url)) {
+                echo '<li>GitHub: <a href="' . esc_url($github_url) . '" target="_blank">' . esc_html($github_url) . '</a></li>';
+            }
+
+            if (!empty($notion_url)) {
+                echo '<li>Notion: <a href="' . esc_url($notion_url) . '" target="_blank">' . esc_html($notion_url) . '</a></li>';
+            }
+
+			if (!empty($blog_url)) {
+                echo '<li>Blog: <a href="' . esc_url($blog_url) . '" target="_blank">' . esc_html($blog_url) . '</a></li>';
+            }
+            ?>
+        </ul>
+    </aside>
+    <?php
+    return ob_get_clean();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
