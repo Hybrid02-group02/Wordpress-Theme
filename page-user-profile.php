@@ -155,6 +155,7 @@ do_action('onepress_page_before_content');
                         </script>
                     <?php endif; ?>
 
+
                     <form method="POST" enctype="multipart/form-data">
                         <p>
                             <label for="user_avatar">프로필 사진:</label><br>

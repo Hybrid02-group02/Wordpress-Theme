@@ -35,4 +35,6 @@ if ( function_exists( 'wp_body_open' ) ) {
 	onepress_header();
 	
 	?>
+</div>
+
 

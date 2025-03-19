@@ -20,10 +20,21 @@ if ( get_theme_mod( 'onepress_hide_thumnail_if_not_exists', false ) ) {
 	<div class="list-article-thumb">
 		<a href="<?php echo esc_url( get_permalink() ); ?>">
 			<?php
-			if ( has_post_thumbnail() ) {
-				the_post_thumbnail( 'onepress-blog-small' );
+			// 특성 이미지(글 등록시 오른쪽 사이드 바에서 등록)가 있으면 그 이미지를 썸네일로 사용
+			if (has_post_thumbnail()) {
+				the_post_thumbnail('onepress-blog-small', array('class' => 'thumbnail-size'));	// 특성 이미지 크기 조정해 등록
 			} else {
-				echo '<img alt="" src="' . esc_url(get_template_directory_uri() . '/assets/images/placholder2.png') .'" width="300" height="150">';
+				// 특성 이미지가 없으면 본문에서 첫 번째 이미지 추출
+				$content = apply_filters( 'the_content', get_post_field( 'post_content', get_the_ID() ) );
+				$first_image = get_first_image_from_content( $content );
+
+				if ( $first_image ) {
+					// 첫 번째 이미지를 썸네일로 사용
+					echo '<img alt="" src="' . esc_url( $first_image ) . '" class="thumbnail-size">';
+				} else {
+					// 첫 번째 이미지도 없으면 기본 이미지 사용
+					echo '<img alt="" src="' . esc_url( get_template_directory_uri() . '/assets/images/thumbnail_image.png' ) . '" class="thumbnail-size">';
+				}
 			}
 			?>
 		</a>

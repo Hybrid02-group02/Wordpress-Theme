@@ -649,7 +649,7 @@ function custom_register_block_patterns() {
         $pattern_name = basename($file, '.php');
         
         // 슬러그 생성 (배열 밖에서 정의)
-        $slug = 'custom-' . sanitize_title($pattern_name);
+        $slug = 'custom-' . sanitize_key($pattern_name);
 
         register_block_pattern(
             $slug, // slug 필수!
@@ -735,53 +735,6 @@ function perform_redirect_after_post_delete() {
     }
 }
 add_action('wp', 'perform_redirect_after_post_delete');
-
-
-
-// 사용자 상세 프로필 편집 페이지 등록
-function create_user_profile_page() {
-    // 페이지가 존재하는지 확인
-    $existing_page = get_page_by_path( 'user-profile' );
-    if ($existing_page) {
-        echo '<div>페이지 존재: ' . esc_html( $existing_page->ID ) . '</div>';
-    } else {
-        echo '<div>페이지가 없습니다. 새로 생성합니다.</div>';
-        // 페이지가 존재하지 않으면 새로 생성
-        $page_data = array(
-            'post_title'    => '상세 프로필 편집',
-            'post_content'  => '상세 프로필 편집 페이지의 내용이나 템플릿을 추가하세요.',
-            'post_status'   => 'publish',
-            'post_type'     => 'page',
-            'post_name'     => 'user-profile',
-            'post_author'   => 1, // 페이지의 작성자는 관리자(1)
-        );
-
-        $page_id = wp_insert_post( $page_data );
-
-        // 페이지 ID를 확인
-        echo '<div>새로 생성된 페이지 ID: ' . esc_html( $page_id ) . '</div>';
-
-        // 페이지에 템플릿 지정 (page-user-profile.php)
-        if ( !is_wp_error( $page_id ) && $page_id > 0 ) {
-            update_post_meta( $page_id, '_wp_page_template', 'page-user-profile.php' );
-        }
-    }
-}
-add_action( 'wp_login', 'create_user_profile_page' );	// 테마가 활성화될 때 한 번만 실행
-
-
-// 상세 프로필 편집 페이지 연결 권한 
-function custom_page_access_control() {
-    // 'user-profile' 페이지에 접근하려면 최소한 'author' 권한이 있어야 함
-    if (is_page('user-profile')) {
-        // 'author' 권한이 있는 유저만 접근 허용
-        if (!current_user_can('edit_posts')) {  // 'edit_posts' 권한을 가진 유저는 'author' 이상
-            wp_redirect(home_url()); // 권한이 없는 경우 홈으로 리다이렉트
-            exit;
-        }
-    }
-}
-add_action('template_redirect', 'custom_page_access_control');
 
 
 

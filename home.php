@@ -28,9 +28,9 @@ $layout = onepress_get_layout();	// "right-sidebar"
 	// 사용자 이름과 권한에 따른 블로그 제목 설정
 	$blog_title = '';
 	if ( in_array( 'author', (array) $current_user->roles ) ) {
-		$blog_title = esc_js( $current_user->display_name ) . ' 님의 기술 블로그';
+		$blog_title = esc_js( $current_user->nickname ) . ' 님의 기술 블로그';
 	} else {
-		$blog_title = esc_js( $current_user->display_name ) . '님 환영합니다';
+		$blog_title = esc_js( $current_user->nickname ) . '님 환영합니다';
 	}
 	?>
 
@@ -94,8 +94,11 @@ $layout = onepress_get_layout();	// "right-sidebar"
 					}
 					?>
 				</div>
-				<!-- 카테고리 목록 출력 끝 -->				
-		
+				<!-- 카테고리 목록 출력 끝 -->
+
+				<div id="profileFormContainer"></div>
+
+
 				<main id="main" class="site-main" role="main">
 
 				<?php if ( have_posts() ) : ?>
@@ -132,7 +135,10 @@ $layout = onepress_get_layout();	// "right-sidebar"
 				</main>
 			</div>
 
-			<?php get_sidebar(); ?>
+			<!-- 사이드바를 표시할지 여부를 체크 -->
+			<?php if ( current_user_can( 'administrator' ) || current_user_can( 'author' ) ) : ?>
+				<?php get_sidebar(); ?>
+			<?php endif; ?>
 
 		</div>
 	</div>
