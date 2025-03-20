@@ -623,6 +623,70 @@ add_action( 'pre_get_posts', 'restrict_content_to_author' );
 
 
 
+// 사용자가 작성한 게시물의 카테고리 객체 배열
+function display_user_categories( $user_id ) {
+	// 사용자 ID가 유효한지 확인
+	if ( ! is_numeric( $user_id ) || $user_id <= 0 ) {
+		echo '<p>유효하지 않은 사용자입니다.</p>';
+		return;
+	}
+
+	// 현재 사용자 정보 가져오기
+	$current_user = get_userdata( $user_id );
+	$user_categories = array();
+
+	// 관리자 또는 글쓴이 권한이면 해당 사용자의 게시물 카테고리 가져오기
+	if ( in_array( 'administrator', (array) $current_user->roles, true ) || in_array( 'author', (array) $current_user->roles, true ) ) {
+		$user_posts = get_posts( array(
+			'author' => $user_id,
+			'posts_per_page' => -1,
+			'post_status' => 'publish', // 발행된 게시물만
+		) );
+
+		// 게시물에서 카테고리 추출
+		foreach ( $user_posts as $post ) {
+			$categories = get_the_category( $post->ID );
+			foreach ( $categories as $category ) {
+				if ( ! array_key_exists( $category->term_id, $user_categories ) ) {
+					$user_categories[ $category->term_id ] = $category;
+				}
+			}
+		}
+	} else {
+		// 구독자 권한이면 전체 발행된 글에서 카테고리 가져오기
+		$all_posts = get_posts( array(
+			'posts_per_page' => -1,
+			'post_status' => 'publish', // 발행된 게시물만
+		) );
+
+		foreach ( $all_posts as $post ) {
+			$categories = get_the_category( $post->ID );
+			foreach ( $categories as $category ) {
+				if ( ! array_key_exists( $category->term_id, $user_categories ) ) {
+					$user_categories[ $category->term_id ] = $category;
+				}
+			}
+		}
+	}
+
+	// 카테고리 목록 출력
+	echo '<div class="category-list" style="margin-bottom: 40px;">';
+	echo '<h3>Categories</h3>';
+
+	if ( ! empty( $user_categories ) ) {
+		foreach ( $user_categories as $category ) {
+			echo '<a href="' . esc_url( get_category_link( $category->term_id ) ) . '" class="custom-category-button">' . esc_html( $category->name ) . '</a> ';
+		}
+	} else {
+		echo '<p>작성된 카테고리가 없습니다.</p>';
+	}
+	echo '</div>';
+}
+
+
+
+
+
 // patterns 폴더 아래의 Custom Pattern을 일괄적으로 등록
 function custom_register_block_patterns() {
     $patterns_dir = get_template_directory() . '/patterns/';

@@ -58,41 +58,7 @@ $layout = onepress_get_layout();	// "right-sidebar"
 
 				<!-- 카테고리 목록 출력 추가 -->
 				<div class="category-list" style="margin-bottom: 20px;">
-					<h3> Categories </h3>
-					<?php
-					$current_user_id = get_current_user_id();
-
-					// 사용자가 작성한 게시물 목록을 가져옴
-					$user_posts = get_posts( array(
-						'author' => $current_user_id,
-						'posts_per_page' => -1,
-						'post_status' => 'publish', // 발행된 게시물만
-					) );
-
-					// 게시물에서 사용된 카테고리 목록을 저장할 배열
-					$user_categories = array();
-
-					// 각 게시물에서 카테고리 추출
-					foreach ( $user_posts as $post ) {
-						$categories = get_the_category( $post->ID );
-						foreach ( $categories as $category ) {
-							// 중복을 방지하기 위해 배열에 카테고리 객체를 추가
-							if ( ! in_array( $category, $user_categories ) ) {
-								$user_categories[] = $category;
-							}
-						}
-					}
-
-					// 카테고리 목록 출력
-					if ( ! empty( $user_categories ) ) {
-						foreach ( $user_categories as $category ) {
-							// 카테고리 링크를 버튼처럼 스타일링
-							echo '<a href="' . get_category_link( $category->term_id ) . '" class="custom-category-button">' . $category->name . '</a> ';
-						}
-					} else {
-						echo '작성된 카테고리가 없습니다.';
-					}
-					?>
+					<?php display_user_categories( get_current_user_id() ); ?>
 				</div>
 				<!-- 카테고리 목록 출력 끝 -->
 

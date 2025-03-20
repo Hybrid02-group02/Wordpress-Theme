@@ -46,6 +46,15 @@ do_action( 'onepress_page_before_content' );
 				<?php get_sidebar(); ?>
 			<?php endif; ?>
 
+			<!-- 현재 로그인한 사람이 구독자라면, 글 작성자의 사이드바를 출력 -->
+			<?php if ( current_user_can( 'subscriber' ) ) : ?>
+				<?php
+					// 현재 포스트의 작성자 로그인 이름을 출력
+					$author_login_name = get_the_author_meta( 'user_login', get_the_author_meta( 'ID' ) );
+					echo return_user_sidebar($author_login_name);
+				?>
+			<?php endif; ?>
+
 		</div>
 	</div>
 
