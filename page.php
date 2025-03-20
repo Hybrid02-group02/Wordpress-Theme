@@ -45,9 +45,19 @@ do_action( 'onepress_page_before_content' );
 				</main>
 			</div>
 
-            <?php if ( $layout != 'no-sidebar' ) { ?>
-                <?php get_sidebar(); ?>
-            <?php } ?>
+			<!-- 사이드바를 표시할지 여부를 체크 -->
+			<?php if ( current_user_can( 'administrator' ) || current_user_can( 'author' ) ) : ?>
+				<?php get_sidebar(); ?>
+			<?php endif; ?>
+
+			<?php if ( current_user_can( 'subscriber' ) ) : ?>
+				<?php
+					// 글의 작성자 ID와 로그인 네임 가져오기
+					$author_id = get_post_field('post_author');
+					$author_login_name = get_the_author_meta('user_login', $author_id);
+					echo return_user_sidebar($author_login_name);
+				?>
+			<?php endif; ?>
 
 		</div>
 	</div>

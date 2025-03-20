@@ -741,7 +741,10 @@ add_action('wp', 'perform_redirect_after_post_delete');
 // 특정 사용자의 사이드바 구현
 // <?php echo return_user_sidebar('사용자 별칭'); 으로 사용 
 function return_user_sidebar($username) {
-    // 사용자명으로 사용자 객체 얻기
+    
+	$current_user = wp_get_current_user();
+	
+	// 사용자명으로 사용자 객체 얻기
     $user = get_user_by('login', $username);
     
     // 사용자가 존재하지 않으면 반환하지 않음
@@ -793,7 +796,30 @@ function return_user_sidebar($username) {
             }
             ?>
         </ul>
+
+		<?php if ( current_user_can( 'administrator' ) || current_user_can( 'author' ) ) : ?>
+			<button class="custom-category-button" id="profileEditButton">
+        		상세 프로필 편집
+    		</button>
+		<?php endif; ?>
+
+
+		<div id="user_profile_edit_form" style="margin-top: 20px; display: none;">
+        	<?php get_template_part( 'template-parts/content', 'profile-edit' ); ?>
+    	</div>
     </aside>
+
+    <script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const editButton = document.getElementById('profileEditButton');
+			const editForm = document.getElementById('user_profile_edit_form');
+
+			editButton.addEventListener('click', function () {
+				editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+			});
+		});
+	</script>
+
     <?php
     return ob_get_clean();
 }

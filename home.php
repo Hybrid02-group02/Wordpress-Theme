@@ -96,9 +96,6 @@ $layout = onepress_get_layout();	// "right-sidebar"
 				</div>
 				<!-- 카테고리 목록 출력 끝 -->
 
-				<div id="profileFormContainer"></div>
-
-
 				<main id="main" class="site-main" role="main">
 
 				<?php if ( have_posts() ) : ?>

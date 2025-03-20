@@ -55,9 +55,10 @@ $layout = onepress_get_layout();
 				</main>
 			</div>
 
-            <?php if ( $layout != 'no-sidebar' ) { ?>
-                <?php get_sidebar(); ?>
-            <?php } ?>
+			<!-- 사이드바를 표시할지 여부를 체크 -->
+			<?php if ( current_user_can( 'administrator' ) || current_user_can( 'author' ) ) : ?>
+				<?php get_sidebar(); ?>
+			<?php endif; ?>
 
 		</div>
 	</div>
