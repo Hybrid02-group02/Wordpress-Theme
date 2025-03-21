@@ -700,20 +700,19 @@ function custom_register_block_patterns() {
             continue; // 배열 형태가 아니면 건너뜀
         }
 
-        // 패턴 카테고리 등록
-        if (!empty($pattern_data['categories'])) {
-            foreach ($pattern_data['categories'] as $category) {
-                if (!WP_Block_Pattern_Categories_Registry::get_instance()->is_registered($category)) {
-                    register_block_pattern_category($category, array('label' => ucfirst($category)));
-                }
-            }
-        }
+		// 패턴 카테고리 등록 (이미 등록된 경우 중복 방지)
+		if (!empty($pattern_data['categories'])) {
+			foreach ($pattern_data['categories'] as $category) {
+				register_block_pattern_category($category, array('label' => ucfirst($category)));
+			}
+		}
 
         // 파일 이름에서 .php 확장자 제거
         $pattern_name = basename($file, '.php');
         
-        // 슬러그 생성 (배열 밖에서 정의)
-        $slug = 'custom-' . sanitize_key($pattern_name);
+        // 슬러그 생성
+        $pattern_name = basename($file, '.php');
+        $slug = 'custom-' . strtolower(preg_replace('/[^a-z0-9-_]/', '', $pattern_name));
 
         register_block_pattern(
             $slug, // slug 필수!
@@ -727,7 +726,7 @@ function custom_register_block_patterns() {
         );
     }
 }
-add_action('init', 'custom_register_block_patterns');
+add_action('after_setup_theme', 'custom_register_block_patterns');
 
 
 
@@ -750,7 +749,7 @@ add_action('init', 'custom_register_block_patterns');
 //         }
 //     }
 // }
-// add_action('init', 'custom_unregister_dynamic_block_patterns');
+// add_action('after_setup_theme', 'custom_unregister_dynamic_block_patterns');
 
 
 
@@ -871,6 +870,9 @@ function return_user_sidebar($username) {
 		<div id="user_profile_edit_form" style="margin-top: 20px; display: none;">
         	<?php get_template_part( 'template-parts/content', 'profile-edit' ); ?>
     	</div>
+
+
+
     </aside>
 
     <script>
@@ -887,14 +889,6 @@ function return_user_sidebar($username) {
     <?php
     return ob_get_clean();
 }
-
-
-
-
-
-
-
-
 
 
 

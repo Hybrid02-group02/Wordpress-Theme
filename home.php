@@ -61,6 +61,14 @@ $layout = onepress_get_layout();	// "right-sidebar"
 					<?php display_user_categories( get_current_user_id() ); ?>
 				</div>
 				<!-- 카테고리 목록 출력 끝 -->
+				
+				<div class="search-form-container" style="margin-bottom: 20px;">
+                	<?php get_search_form(); ?>
+            	</div>
+
+				<!-- <div class="chatbot-container" style="margin-top: 20px;">
+					<?php // echo do_shortcode('[mwai_chatbot id="default"]'); ?>
+				</div> -->
 
 				<main id="main" class="site-main" role="main">
 
