@@ -34,20 +34,40 @@ $layout = onepress_get_layout();	// "right-sidebar"
 	}
 	?>
 
-	<!-- 페이지 헤더에 사용자 이름 표시 -->
+	<!-- 페이지 헤더 기능 구현현 -->
 	<script type="text/javascript">
 		document.addEventListener('DOMContentLoaded', function() {
 			if (document.body.classList.contains('home')) {
-				const pageHeader = document.querySelector('.page-header .entry-title');
+				const pageHeaderContainer = document.querySelector('.page-header .container');
 
-				if (pageHeader) {
-					const blogTitle = '<?php echo $blog_title; ?>';
-					pageHeader.innerHTML = blogTitle;
-				}
+				if (pageHeaderContainer) {
+				const blogTitle = '<?php echo $blog_title; ?>';
+
+				// 새로운 Flex 컨테이너 생성
+				const flexContainer = document.createElement('div');
+				flexContainer.className = 'header-flex-container';
+
+				// 제목 요소 생성
+				const titleElement = document.createElement('h1');
+				titleElement.className = 'entry-title';
+				titleElement.textContent = blogTitle;
+
+				// 검색 폼 생성
+				const searchForm = `<?php ob_start(); get_search_form(); echo ob_get_clean(); ?>`;
+				const searchWrapper = document.createElement('div');
+				searchWrapper.className = 'header-search-form';
+				searchWrapper.innerHTML = searchForm;
+
+				// 요소 추가
+				flexContainer.appendChild(titleElement);
+				flexContainer.appendChild(searchWrapper);
+				pageHeaderContainer.innerHTML = ''; // 기존 내용 제거
+				pageHeaderContainer.appendChild(flexContainer);
+			}
 			}
 		});
 	</script>
-	<!-- 헤더에 이름 표시 끝 -->
+	<!-- 헤더 기능 구현 끝끝 -->
 
 
 	<div id="content" class="site-content">
@@ -62,9 +82,9 @@ $layout = onepress_get_layout();	// "right-sidebar"
 				</div>
 				<!-- 카테고리 목록 출력 끝 -->
 				
-				<div class="search-form-container" style="margin-bottom: 20px;">
-                	<?php get_search_form(); ?>
-            	</div>
+				<!-- <div class="search-form-container" style="margin-bottom: 20px;">
+                	<?php //get_search_form(); ?>
+            	</div> -->
 
 				<!-- <div class="chatbot-container" style="margin-top: 20px;">
 					<?php // echo do_shortcode('[mwai_chatbot id="default"]'); ?>

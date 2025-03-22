@@ -108,6 +108,18 @@ if (isset($_POST['submit_profile'])) {
             $profile_updated = true;
         }
     }
+
+    // 프로필 업데이트 후 리다이렉션 및 캐시 방지
+    if ($profile_updated) {
+        // 캐시 방지 헤더 추가
+        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+
+        // 리다이렉트
+        wp_redirect(get_permalink());
+        exit;
+    }
 }
 ?>
 
@@ -115,7 +127,6 @@ if (isset($_POST['submit_profile'])) {
 <?php if ($profile_updated) : ?>
     <script type="text/javascript">
         alert('프로필이 업데이트 되었습니다!');
-        window.location.reload();
     </script>
 <?php endif; ?>
 
@@ -127,31 +138,31 @@ if (isset($_POST['submit_profile'])) {
     </p>
     <p>
         <label for="user_lastname">성:</label><br>
-        <input type="text" name="user_lastname" id="user_lastname" value="<?php echo esc_attr($updated_lastname ?? $current_user->user_lastname); ?>">
+        <input type="text" name="user_lastname" id="user_lastname" style="width: 250px;" value="<?php echo esc_attr($updated_lastname ?? $current_user->user_lastname); ?>">
     </p>
     <p>
         <label for="user_firstname">이름:</label><br>
-        <input type="text" name="user_firstname" id="user_firstname" value="<?php echo esc_attr($updated_firstname ?? $current_user->user_firstname); ?>">
+        <input type="text" name="user_firstname" id="user_firstname" style="width: 250px;" value="<?php echo esc_attr($updated_firstname ?? $current_user->user_firstname); ?>">
     </p>
     <p>
         <label for="user_nickname">별칭:</label><br>
-        <input type="text" name="user_nickname" id="user_nickname" value="<?php echo esc_attr($updated_nickname ?? $current_user->nickname); ?>">
+        <input type="text" name="user_nickname" id="user_nickname" style="width: 250px;" value="<?php echo esc_attr($updated_nickname ?? $current_user->nickname); ?>">
     </p>
     <p>
         <label for="user_email">이메일:</label><br>
-        <input type="email" name="user_email" id="user_email" value="<?php echo esc_attr($updated_email ?? $current_user->user_email); ?>">
+        <input type="email" name="user_email" id="user_email" style="width: 250px;" value="<?php echo esc_attr($updated_email ?? $current_user->user_email); ?>">
     </p>
     <p>
         <label for="github_url">GitHub 주소:</label><br>
-        <input type="url" name="user_github_url" id="user_github_url" value="<?php echo esc_attr(get_user_meta($current_user->ID, 'github_url', true)); ?>">
+        <input type="url" name="user_github_url" id="user_github_url" style="width: 250px;" value="<?php echo esc_attr(get_user_meta($current_user->ID, 'github_url', true)); ?>">
     </p>
     <p>
         <label for="user_notion_url">Notion 주소:</label><br>
-        <input type="url" name="user_notion_url" id="user_notion_url" value="<?php echo esc_attr(get_user_meta($current_user->ID, 'user_notion_url', true)); ?>">
+        <input type="url" name="user_notion_url" id="user_notion_url" style="width: 250px;" value="<?php echo esc_attr(get_user_meta($current_user->ID, 'user_notion_url', true)); ?>">
     </p>
     <p>
         <label for="user_blog_url">블로그 URL:</label><br>
-        <input type="url" name="user_blog_url" id="user_blog_url" value="<?php echo esc_attr($updated_blog_url ?? get_user_meta($current_user->ID, 'user_blog_url', true)); ?>">
+        <input type="url" name="user_blog_url" id="user_blog_url" style="width: 250px;" value="<?php echo esc_attr($updated_blog_url ?? get_user_meta($current_user->ID, 'user_blog_url', true)); ?>">
     </p>
     <p>
         <input type="submit" name="submit_profile" value="프로필 저장" class="custom-category-button">

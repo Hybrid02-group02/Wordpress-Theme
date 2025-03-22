@@ -636,7 +636,7 @@ function display_user_categories( $user_id ) {
 	$user_categories = array();
 
 	// 관리자 또는 글쓴이 권한이면 해당 사용자의 게시물 카테고리 가져오기
-	if ( in_array( 'administrator', (array) $current_user->roles, true ) || in_array( 'author', (array) $current_user->roles, true ) ) {
+	if ( in_array( 'author', (array) $current_user->roles, true ) ) {
 		$user_posts = get_posts( array(
 			'author' => $user_id,
 			'posts_per_page' => -1,

@@ -33,6 +33,8 @@ if ( function_exists( 'wp_body_open' ) ) {
 	 * @since 2.0.0
 	 */
 	onepress_header();
+	
 	?>
+	
 </div>
 
