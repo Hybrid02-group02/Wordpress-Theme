@@ -5,10 +5,6 @@ return array(
     'categories'  => array('premium'), // 원하는 카테고리 추가
     'content'     =>                // 내용(html 형식 작성)
     '
-    <!-- wp:heading -->
-<h2 class="wp-block-heading"></h2>
-<!-- /wp:heading -->
-
 <!-- wp:heading {"level":3} -->
 <h3 class="wp-block-heading"></h3>
 <!-- /wp:heading -->
