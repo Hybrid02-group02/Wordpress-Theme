@@ -81,16 +81,8 @@ $layout = onepress_get_layout();	// "right-sidebar"
 					<?php display_user_categories( get_current_user_id() ); ?>
 				</div>
 				<!-- 카테고리 목록 출력 끝 -->
-				
-				<!-- <div class="search-form-container" style="margin-bottom: 20px;">
-                	<?php //get_search_form(); ?>
-            	</div> -->
 
-				<!-- <div class="chatbot-container" style="margin-top: 20px;">
-					<?php // echo do_shortcode('[mwai_chatbot id="default"]'); ?>
-				</div> -->
-
-				<main id="main" class="site-main" role="main">
+				<main id="main" class="site-main" role="main" style="margin-top: 20px;">
 
 				<?php if ( have_posts() ) : ?>
 
@@ -126,9 +118,13 @@ $layout = onepress_get_layout();	// "right-sidebar"
 				</main>
 			</div>
 
-			<!-- 사이드바를 표시할지 여부를 체크 -->
+			<!-- 어떤 사이드바를 표시할지 체크 -->
 			<?php if ( current_user_can( 'administrator' ) || current_user_can( 'author' ) ) : ?>
 				<?php get_sidebar(); ?>
+			<?php endif; ?>
+			
+			<?php if ( current_user_can( 'subscriber' )) : ?>
+				<?php echo return_user_tags(); ?>
 			<?php endif; ?>
 
 		</div>

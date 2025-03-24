@@ -65,18 +65,27 @@ $archive_author = !empty( $matches[2] ) ? $matches[2] : '';    // <span> </span>
 				</main>
 			</div>
 
-			<!-- 사이드바를 표시할지 여부를 체크 -->
+			<!-- 어떤 사이드바를 표시할지 체크 -->
 			<?php if ( current_user_can( 'administrator' ) || current_user_can( 'author' )) : ?>
 				<?php get_sidebar(); ?>
 			<?php endif; ?>
 
+
+
 			<?php
-				// 로그인한 사용자가 구독자 권한을 가지고 있고, archive_subject 값이 "글쓴이" 또는 "Author"인 경우, 사이드바 출력
+				// 로그인한 사용자가 구독자 권한을 가지고 있고, archive_subject 값이 "글쓴이" 또는 "Author"인 경우, 사이드바+태그 출력
 				if ( current_user_can( 'subscriber' ) && in_array( $archive_subject, ['글쓴이', 'Author'] ) ) :
-					echo return_user_sidebar( $archive_author ); // $archive_author 값에 해당하는 사용자의 사이드바 출력
+					echo '<div class="sidebar-wrapper">';
+					echo return_user_sidebar( $archive_author );
+					echo return_user_tags($archive_author);
+					echo '</div>';
+				// 로그인한 사용자가 구독자 권한을 가지고 있고, archive_subject 값이 "카테고리" 또는 "Category"인 경우, 태그만 출력
+				elseif ( current_user_can( 'subscriber' ) && in_array( $archive_subject, ['카테고리', 'Category'] ) ) :
+					echo '<div class="sidebar-wrapper">';
+					echo return_user_tags();
+					echo '</div>';
 				endif;
 			?>
-
 		</div>
 	</div>
 

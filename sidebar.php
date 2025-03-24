@@ -9,7 +9,11 @@
 $current_user = wp_get_current_user();
 ?>
 
-<?php echo return_user_sidebar($current_user->user_login); ?>
+<div class="sidebar-wrapper">
+    <?php echo return_user_sidebar($current_user->user_login); ?>
+
+    <?php echo return_user_tags(); ?>
+</div>
 
 
 

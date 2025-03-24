@@ -99,6 +99,20 @@ if ( get_theme_mod( 'onepress_hide_thumnail_if_not_exists', false ) ) {
 				<span class="post-author">  |  <a href="<?php echo esc_url(get_author_posts_url(get_the_author_meta('ID'))); ?>"><?php the_author(); ?></a></span>
 			<?php endif; ?>
 		</div>
+
+		<div class="entry-tags" style="margin-top: 10px;">
+			<?php 
+			$tags = get_the_tags();
+			if ($tags) {
+				foreach ($tags as $tag) {
+					$tag_link = get_tag_link($tag->term_id); // 태그의 링크 가져오기
+					echo '<a href="' . esc_url($tag_link) . '" class="tag-with-hashtag">#' . esc_html($tag->name) . '</a> ';
+				}
+			}
+			?>
+		</div>
+
+
 		<?php } ?>
 		<?php
 		/**

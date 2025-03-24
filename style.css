@@ -4729,6 +4729,32 @@ div.wpforms-container .wpforms-form button[type=submit] {
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.05); /* 영역 바깥으로 그림자처럼 확장되는 효과 */
 }
 
+/* 사이드바들을 수직으로 나란히 배치 */
+.sidebar-wrapper {
+  display: flex;               /* 기본적으로 수평 배치 */
+  flex-direction: column;      /* 수직 배치로 변경 */
+  gap: 20px;                   /* 사이 여백 */
+}
+
+/* 각각의 사이드바 크기 조정 */
+.widget-area {
+  flex: 1;                     /* 각 사이드바가 비례적으로 크기를 가지도록 */
+  min-width: 300px;            /* 최소 너비 설정 */
+}
+
+/* return_user_tags()에서 출력하는 태그 스타일 */
+.user-tags div {
+  margin-bottom: 10px;
+}
+
+.tag-with-hashtag {
+  color: #0073aa; /* 글자 색 */
+  margin: 0 3px;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: bold;
+  display: inline-block;
+}
 
 
 

@@ -890,7 +890,82 @@ function return_user_sidebar($username) {
     return ob_get_clean();
 }
 
+// 태그 출력
+// <?php echo return_user_tags(); 으로 사용
+function return_user_tags($author_login = '') {
+    if (!is_user_logged_in()) {
+        return '<p>로그인 후 이용 가능합니다.</p>';
+    }
 
+    ob_start();
+
+    // 작성자 정보를 매개변수로 받으면 해당 작성자의 글만 조회
+    if ($author_login) {
+        $author = get_user_by('login', $author_login);
+
+        // 유효하지 않은 작성자일 경우 메시지 반환
+        if (!$author) {
+            return '<p>유효한 작성자가 없습니다.</p>';
+        }
+
+        $author_id = $author->ID;
+    } else {
+        // 로그인한 사용자의 정보 사용
+        $current_user = wp_get_current_user();
+        $author_id = in_array('author', $current_user->roles) ? $current_user->ID : null;
+    }
+
+    $args = [
+        'post_type'      => 'post',
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
+    ];
+
+    // 특정 작성자가 있으면 해당 작성자 글만 필터링
+    if ($author_id) {
+        $args['author'] = $author_id;
+    }
+
+    $query = new WP_Query($args);
+    $tags_array = [];
+
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+
+            $post_tags = get_the_tags();
+            if ($post_tags) {
+                foreach ($post_tags as $tag) {
+                    $tags_array[$tag->term_id] = $tag; // 중복 제거
+                }
+            }
+        }
+        wp_reset_postdata();
+    }
+
+    if (empty($tags_array)) {
+        return '';
+    }
+
+    // 새로운 aside(세 번째 영역) 정의
+    echo '<aside id="third" class="widget-area sidebar" role="complementary" style="margin-top: 20px; margin-bottom: 20px;">';
+    echo '<h3>Tags</h3>';
+
+    echo '<div class="user-tags">';
+    foreach ($tags_array as $tag) {
+        // 각 태그에 대한 게시물 수 가져오기
+        $tag_count = $tag->count;
+
+        // 태그 링크와 함께 글 수 출력
+        $tag_link = get_tag_link($tag->term_id);
+        echo '<div><a href="' . esc_url($tag_link) . '" class="tag-link">' . esc_html($tag->name) . ' (' . $tag_count . ')</a></div>';
+    }
+    echo '</div>';
+
+    echo '</aside>';
+
+    return ob_get_clean();
+}
 
 
 

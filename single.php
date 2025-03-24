@@ -52,6 +52,7 @@ do_action( 'onepress_page_before_content' );
 					// 현재 포스트의 작성자 로그인 이름을 출력
 					$author_login_name = get_the_author_meta( 'user_login', get_the_author_meta( 'ID' ) );
 					echo return_user_sidebar($author_login_name);
+					echo return_user_tags($author_login_name);
 				?>
 			<?php endif; ?>
 

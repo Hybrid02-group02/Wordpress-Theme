@@ -109,26 +109,18 @@ if (isset($_POST['submit_profile'])) {
         }
     }
 
-    // 프로필 업데이트 후 리다이렉션 및 캐시 방지
-    if ($profile_updated) {
-        // 캐시 방지 헤더 추가
-        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-        header("Pragma: no-cache");
-        header("Expires: 0");
+}
 
-        // 리다이렉트
-        wp_redirect(get_permalink());
-        exit;
-    }
+// 프로필 업데이트 후 리다이렉션 및 알림
+if ($profile_updated) {
+    // JavaScript로 리다이렉트
+    echo '<script type="text/javascript">
+            alert("프로필이 업데이트 되었습니다!");
+            location.reload(true);
+          </script>';
+    exit;
 }
 ?>
-
-<!-- 알림창 띄우기 -->
-<?php if ($profile_updated) : ?>
-    <script type="text/javascript">
-        alert('프로필이 업데이트 되었습니다!');
-    </script>
-<?php endif; ?>
 
 
 <form method="POST" enctype="multipart/form-data">
@@ -168,4 +160,5 @@ if (isset($_POST['submit_profile'])) {
         <input type="submit" name="submit_profile" value="프로필 저장" class="custom-category-button">
     </p>
 </form>
+
 
