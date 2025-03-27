@@ -52,22 +52,18 @@ $layout = onepress_get_layout();	// "right-sidebar"
 				titleElement.className = 'entry-title';
 				titleElement.textContent = blogTitle;
 
-				// 검색 폼 생성
-				const searchForm = `<?php ob_start(); get_search_form(); echo ob_get_clean(); ?>`;
-				const searchWrapper = document.createElement('div');
-				searchWrapper.className = 'header-search-form';
-				searchWrapper.innerHTML = searchForm;
+	
 
 				// 요소 추가
 				flexContainer.appendChild(titleElement);
-				flexContainer.appendChild(searchWrapper);
+
 				pageHeaderContainer.innerHTML = ''; // 기존 내용 제거
 				pageHeaderContainer.appendChild(flexContainer);
 			}
 			}
 		});
 	</script>
-	<!-- 헤더 기능 구현 끝끝 -->
+	<!-- 헤더 기능 구현 끝 -->
 
 
 	<div id="content" class="site-content">
