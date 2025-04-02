@@ -34,7 +34,7 @@ $layout = onepress_get_layout();	// "right-sidebar"
 	}
 	?>
 
-	<!-- 페이지 헤더 기능 구현현 -->
+	<!-- 페이지 헤더 기능 구현 -->
 	<script type="text/javascript">
 		document.addEventListener('DOMContentLoaded', function() {
 			if (document.body.classList.contains('home')) {
@@ -52,11 +52,15 @@ $layout = onepress_get_layout();	// "right-sidebar"
 				titleElement.className = 'entry-title';
 				titleElement.textContent = blogTitle;
 
-	
+				// 검색 폼 생성
+				const searchForm = `<?php ob_start(); get_search_form(); echo ob_get_clean(); ?>`;
+				const searchWrapper = document.createElement('div');
+				searchWrapper.className = 'header-search-form';
+				searchWrapper.innerHTML = searchForm;
 
 				// 요소 추가
 				flexContainer.appendChild(titleElement);
-
+				flexContainer.appendChild(searchWrapper);
 				pageHeaderContainer.innerHTML = ''; // 기존 내용 제거
 				pageHeaderContainer.appendChild(flexContainer);
 			}
